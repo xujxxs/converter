@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  converter:
+    build: 
+      context: ./
+    container_name: converter
+    environment:
+      KAFKA_URL: kafka:9092
+      MINIO_URL: minio-convertor:9000
+      DATABASE_URL: postgres-convertor
+      DATABASE_NAME: converter
+      DATABASE_USERNAME: value
+      DATABASE_PASSWORD: value
+    depends_on:
+      - database
+      - kafka
+      - minio
+    networks:
+      - converter_newtwork
+
+  database:
+    container_name: postgres-convertor
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: converter
+      POSTGRES_USER: value
+      POSTGRES_PASSWORD: value
+    networks:
+      - converter_newtwork
+  kafka:
+    image: apache/kafka:latest
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    networks:
+      - converter_newtwork
+  minio:
+    container_name: minio-convertor
+    image: quay.io/minio/minio:latest
+    ports:
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    volumes:
+      - minio_data:/data
+    command: server --console-address ":9001" /data
+    networks:
+      - converter_newtwork
+
+volumes:
+  minio_data:
+
+networks:
+  converter_newtwork:
