@@ -25,7 +25,7 @@ public class FileInboxService {
         return fileInboxRepository.findByIdempotentKey(idempotentId);
     }
     
-    public FileInbox endProcess(FileInbox fileInbox, FileInboxStatus status) {
+    public FileInbox updateStatus(FileInbox fileInbox, FileInboxStatus status) {
         fileInbox.setProcessedDate(LocalDateTime.now());
         fileInbox.setStatus(status);
         return fileInboxRepository.save(fileInbox);

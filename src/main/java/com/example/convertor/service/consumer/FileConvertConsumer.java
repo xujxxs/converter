@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class KafkaConsumer {
+public class FileConvertConsumer {
 
     private final FileInboxService fileInboxService;
     private final FilePipelineService filePipelineService;
@@ -36,10 +36,10 @@ public class KafkaConsumer {
 
         try {
             filePipelineService.process(idempotentionId, event);
-            fileInboxService.endProcess(fileInbox, FileInboxStatus.COMPLETED);
+            fileInboxService.updateStatus(fileInbox, FileInboxStatus.COMPLETED);
             log.info("File: {}, was converted", event);
         } catch(Exception e) {
-            fileInboxService.endProcess(fileInbox, FileInboxStatus.ERROR);
+            fileInboxService.updateStatus(fileInbox, FileInboxStatus.ERROR);
             log.error("Error with message: {}. Detailed:", idempotentionId, e);
         }
     }

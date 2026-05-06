@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.example.convertor.model.dto.File;
+import com.example.convertor.model.dto.FileDataDto;
 import com.example.convertor.util.converter.Converter;
 
 import lombok.RequiredArgsConstructor;
@@ -17,12 +17,12 @@ public class ConverterService {
 
     private final Map<String, Converter> classesConverters;
 
-    public File convertToPdf(File file2Convert) {
-        return classesConverters.get(file2Convert.getExtension()).convertToPdf(file2Convert);
+    public FileDataDto convertToPdf(FileDataDto file2Convert) {
+        return classesConverters.get(file2Convert.extensions()).convertToPdf(file2Convert);
     }
 
-    public boolean isSupportedToConvert(File file2Check) {
-        log.debug("Ext: {}", file2Check.getExtension());
-        return classesConverters.containsKey(file2Check.getExtension());
+    public boolean isSupportedToConvert(FileDataDto file2Check) {
+        log.debug("Ext: {}", file2Check.extensions());
+        return classesConverters.containsKey(file2Check.extensions());
     }
 }

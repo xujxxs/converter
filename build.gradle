@@ -25,6 +25,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-kafka'
 	implementation 'org.apache.pdfbox:pdfbox:2.0.32'
 	implementation 'commons-io:commons-io:2.22.0'
+	implementation 'org.springframework.boot:spring-boot-starter-liquibase'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'

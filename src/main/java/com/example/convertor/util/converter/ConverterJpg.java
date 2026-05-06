@@ -15,16 +15,15 @@ import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import com.example.convertor.exception.ConverterException;
-import com.example.convertor.model.dto.File;
+import com.example.convertor.model.dto.FileDataDto;
 
 public class ConverterJpg implements Converter {
 
-    public File convertToPdf(File file2Convent) {
-        return File.builder()
-                .name(file2Convent.getName().replace(".jpg", ".pdf"))
-                .extension("pdf")
-                .bytes(fileConvertLogic(file2Convent.getBytes()))
-            .build(); 
+    public FileDataDto convertToPdf(FileDataDto file2Convent) {
+        return new FileDataDto(
+            file2Convent.name().replace(".jpg", ".pdf"),
+            "pdf",
+            fileConvertLogic(file2Convent.bytes()));
     }
 
     private byte[] fileConvertLogic(byte[] fileBytes) {

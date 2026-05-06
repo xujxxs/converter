@@ -1,7 +1,7 @@
 package com.example.convertor.util.converter;
 
-import com.example.convertor.model.dto.File;
+import com.example.convertor.model.dto.FileDataDto;
 
 public interface Converter {
-    File convertToPdf(File file2Convert);
+    FileDataDto convertToPdf(FileDataDto file2Convert);
 }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.convertor.config.S3BucketProperties;
 import com.example.convertor.event.Producer;
-import com.example.convertor.model.dto.File;
+import com.example.convertor.model.dto.FileDataDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,13 +27,13 @@ public class FilePipelineService {
     private final S3Service s3Service;
 
     public void process(String key, String event) throws Exception {
-        File donwloadedFile = s3Service.loadFormS3(s3BucketProperties.getDownloadBucketName(), event);
+        FileDataDto donwloadedFile = s3Service.loadFormS3(s3BucketProperties.getDownloadBucketName(), event);
         archiverService.unzip(donwloadedFile).stream()
             .filter(converterService::isSupportedToConvert)
             .map(converterService::convertToPdf)
             .forEach(convertedFile -> {
                 s3Service.saveFile(s3BucketProperties.getSaveBucketName(), convertedFile);
-                producer.sendMessage(SEND_TOPIC, UUID.randomUUID().toString(), convertedFile.getName());
+                producer.sendMessage(SEND_TOPIC, UUID.randomUUID().toString(), convertedFile.name());
             });
     }
 }

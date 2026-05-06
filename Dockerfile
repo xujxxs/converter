@@ -7,7 +7,7 @@ COPY src ./src
 
 RUN ./gradlew clean build -x test
 
-FROM eclipse-temurin:21-jdk
+FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 COPY --from=build /app/build/libs/convertor-0.0.1-SNAPSHOT.jar convertor.jar

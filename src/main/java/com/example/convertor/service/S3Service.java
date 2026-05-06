@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 
-import com.example.convertor.model.dto.File;
+import com.example.convertor.model.dto.FileDataDto;
 
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -19,26 +19,25 @@ public class S3Service {
 
     private final S3Client s3Client;
 
-    public File loadFormS3(String bucket, String key) throws IOException {
+    public FileDataDto loadFormS3(String bucket, String key) throws IOException {
         GetObjectRequest request = GetObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
             .build();
 
-        return File.builder()
-                .name(key)
-                .extension(FilenameUtils.getExtension(key))
-                .bytes(s3Client.getObject(request).readAllBytes())
-            .build();
+        return new FileDataDto(
+            key, 
+            FilenameUtils.getExtension(key), 
+            s3Client.getObject(request).readAllBytes());
     }
 
-    public String saveFile(String bucketName, File file) {
+    public String saveFile(String bucketName, FileDataDto file) {
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(bucketName)
-                .key(file.getName())
+                .key(file.name())
             .build();
-        RequestBody body = RequestBody.fromBytes(file.getBytes());
+        RequestBody body = RequestBody.fromBytes(file.bytes());
         s3Client.putObject(request, body);
-        return file.getName();
+        return file.name();
     }
 }

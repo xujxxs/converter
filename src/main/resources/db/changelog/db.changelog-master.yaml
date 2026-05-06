@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-file-inbox-table
+      author: jxkrbdy
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/001-init-file-inbox.sql
+      rollback:
+        - sql: "DROP TABLE IF EXISTS file_inbox CASCADE;"
