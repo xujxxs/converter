@@ -16,6 +16,11 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.yaml
     default-schema: public
 
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL}
+
 queue:
   kafka:
     group-id: converter-group
