@@ -27,6 +27,9 @@ queue:
     topic:
       file-convert: file-convert
       converted-file: converted-file
+      end-convert:
+        success: success-end-convert-topic
+        error: error-end-convert-topic
 
 s3:
   buckets:

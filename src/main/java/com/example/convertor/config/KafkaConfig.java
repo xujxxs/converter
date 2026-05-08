@@ -34,6 +34,16 @@ public class KafkaConfig {
     }
 
     @Bean
+    NewTopic newSuccessEndTopic(@Value("${queue.kafka.topic.end-convert.success}") String name) {
+        return TopicBuilder.name(name).partitions(3).build();
+    }
+
+    @Bean
+    NewTopic newErrorEndTopic(@Value("${queue.kafka.topic.end-convert.error}") String name) {
+        return TopicBuilder.name(name).partitions(3).build();
+    }
+
+    @Bean
     ConsumerFactory<String, String> consumerFactory() {
         Map<String, Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);

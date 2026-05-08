@@ -1,12 +1,15 @@
 package com.example.convertor.service.consumer;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
+import com.example.convertor.event.Producer;
 import com.example.convertor.model.entity.FileInbox;
 import com.example.convertor.model.enums.FileInboxStatus;
 import com.example.convertor.service.FileInboxService;
@@ -15,12 +18,20 @@ import com.example.convertor.service.FilePipelineService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FileConvertConsumer {
 
+    @Value("${queue.kafka.topic.end-convert.success}")
+    private String endSuccessTopicName;
+    @Value("${queue.kafka.topic.end-convert.success}")
+    private String endErrorTopicName;
+
+    private final ObjectMapper objectMapper;
+    private final Producer producer;
     private final FileInboxService fileInboxService;
     private final FilePipelineService filePipelineService;
 
@@ -35,12 +46,22 @@ public class FileConvertConsumer {
         FileInbox fileInbox = fileInboxService.create(createFileInbox(event, idempotentionId));
 
         try {
-            filePipelineService.process(idempotentionId, event);
+            List<String> fileKeys = filePipelineService.process(idempotentionId, event);
+            producer.sendMessage(
+                endSuccessTopicName, 
+                idempotentionId, 
+                objectMapper.writeValueAsString(fileKeys));
+
             fileInboxService.updateStatus(fileInbox, FileInboxStatus.COMPLETED);
             log.info("File: {}, was converted", event);
         } catch(Exception e) {
+            producer.sendMessage(
+                endErrorTopicName, 
+                idempotentionId, 
+                e.getMessage());
+
             fileInboxService.updateStatus(fileInbox, FileInboxStatus.ERROR);
-            log.error("Error with message: {}. Detailed:", idempotentionId, e);
+            log.error("Error with message: {}. Detailed: ", idempotentionId, e);
         }
     }
 
