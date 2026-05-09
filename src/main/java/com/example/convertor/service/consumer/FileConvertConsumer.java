@@ -18,7 +18,6 @@ import com.example.convertor.service.FilePipelineService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Service
@@ -30,7 +29,6 @@ public class FileConvertConsumer {
     @Value("${queue.kafka.topic.end-convert.success}")
     private String endErrorTopicName;
 
-    private final ObjectMapper objectMapper;
     private final Producer producer;
     private final FileInboxService fileInboxService;
     private final FilePipelineService filePipelineService;
@@ -50,7 +48,7 @@ public class FileConvertConsumer {
             producer.sendMessage(
                 endSuccessTopicName, 
                 idempotentionId, 
-                objectMapper.writeValueAsString(fileKeys));
+                fileKeys.toString());
 
             fileInboxService.updateStatus(fileInbox, FileInboxStatus.COMPLETED);
             log.info("File: {}, was converted", event);
